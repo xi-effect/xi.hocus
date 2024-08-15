@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "description": "Hocuspocus server connected to the real backend via a webhook",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -10,5 +12,9 @@
   },
   "devDependencies": {
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@hocuspocus/server": "^2.13.5",
+    "yjs": "^13.6.18"
   }
 }
