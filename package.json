@@ -1,0 +1,11 @@
+{
+  "name": "xi.hocus",
+  "version": "0.1.0",
+  "description": "Hocuspocus server connected to the real backend via a webhook",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xi-effect/xi.hocus.git"
+  }
+}
