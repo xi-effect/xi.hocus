@@ -1,0 +1,9 @@
+services:
+  hocus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - target: 1234
+        host_ip: 127.0.0.1
+        published: 1234
