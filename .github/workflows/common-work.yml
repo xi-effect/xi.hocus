@@ -1,0 +1,19 @@
+name: Common Pipeline Steps
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      base-tag:
+        type: string
+        required: false
+
+jobs:
+  build:
+    uses: xi-effect/xi.actions/.github/workflows/docker-build.yml@main
+    with:
+      tag: ${{ inputs.tag }}
+      base-tag: ${{ inputs.base-tag }}
+    secrets: inherit
