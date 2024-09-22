@@ -1,4 +1,5 @@
 import { Database } from "@hocuspocus/extension-database"
+import { Logger } from "@hocuspocus/extension-logger"
 import { Server } from "@hocuspocus/server"
 
 import { verifyYDocAccess } from "./hooks/access"
@@ -14,6 +15,7 @@ const server = Server.configure({
   quiet: true,
   onAuthenticate: verifyYDocAccess,
   extensions: [
+    new Logger(),
     new Database({
       fetch: downloadYDocContent,
       store: storeYDocContent,
