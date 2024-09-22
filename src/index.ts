@@ -1,6 +1,9 @@
+import { Database } from "@hocuspocus/extension-database"
 import { Server } from "@hocuspocus/server"
 
 import { verifyYDocAccess } from "./hooks/access"
+import { downloadYDocContent } from "./hooks/download"
+import { storeYDocContent } from "./hooks/store"
 
 const server = Server.configure({
   name: "xi.hocus",
@@ -10,6 +13,12 @@ const server = Server.configure({
   maxDebounce: 30000,
   quiet: true,
   onAuthenticate: verifyYDocAccess,
+  extensions: [
+    new Database({
+      fetch: downloadYDocContent,
+      store: storeYDocContent,
+    }),
+  ],
 })
 
 server.listen()
