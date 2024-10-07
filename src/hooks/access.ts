@@ -5,11 +5,11 @@ import { HocusPocusError, logServerError } from "../common/errors"
 import { fetchStorage } from "../common/fetcher"
 
 function getSimpleHeaderValue(headers: IncomingHttpHeaders, name: string): string {
-  const header = headers[name]
+  const header = headers[name.toLowerCase()]
   if (typeof header === "string") {
     return header
   }
-  logServerError(`Invalid auth header in ${name}: ${header}`)
+  logServerError(`Invalid auth header in ${name}: ${header}\n${headers}`)
   throw new HocusPocusError("Proxy Error")
 }
 
