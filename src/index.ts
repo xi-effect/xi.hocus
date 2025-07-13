@@ -6,7 +6,7 @@ import { verifyYDocAccess } from "./hooks/access"
 import { downloadYDocContent } from "./hooks/download"
 import { storeYDocContent } from "./hooks/store"
 
-const server = Server.configure({
+const server = new Server({
   name: "xi.hocus",
   port: 1234,
   timeout: 30000,
