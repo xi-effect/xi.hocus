@@ -28,7 +28,7 @@ function parseProxyHeaders(requestHeaders: IncomingHttpHeaders): ProxyAuthHeader
 }
 
 export async function verifyYDocAccess(
-  { documentName, requestHeaders, connectionConfig }: onAuthenticatePayload
+  { documentName, requestHeaders, connection }: onAuthenticatePayload
 ): Promise<{} | ProxyAuthHeadersT> {
   if (documentName.startsWith("test/")) return {}
 
@@ -48,7 +48,7 @@ export async function verifyYDocAccess(
     if (data === "read-write") {
       return proxyAuthHeaders
     } else if (data === "read-only") {
-      connectionConfig.readOnly = true
+      connection.readOnly = true
       return proxyAuthHeaders
     } else {
       throw new HocusPocusError("Access Denied")
