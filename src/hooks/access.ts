@@ -38,54 +38,31 @@ export async function verifyYDocAccess(
     throw new HocusPocusError("Invalid document name")
   }
 
-  if (token == documentName) {
-    const response = await fetchStorage(
-      `/ydocs/${documentName}/access-level/`,
-      { headers: proxyAuthHeaders }
-    )
-
-    if (response?.ok) {
-      const data = await response.json()
-      if (data === "read-write") {
-        return proxyAuthHeaders
-      } else if (data === "read-only") {
-        connection.readOnly = true
-        return proxyAuthHeaders
-      } else {
-        throw new HocusPocusError("Access Denied")
+  const response = await fetchStorage(
+    `/ydocs/${documentName}/access-level/`,
+    {
+      headers: {
+        "X-Storage-Token": token,
+        ...proxyAuthHeaders,
       }
-    } else if (response?.status === 404) {
-      throw new HocusPocusError("YDoc not found")
-    } else {
-      throw new HocusPocusError()
     }
+  )
+
+  if (response?.ok) {
+    const data = await response.json()
+    if (data === "read-write") {
+      return proxyAuthHeaders
+    } else if (data === "read-only") {
+      connection.readOnly = true
+      return proxyAuthHeaders
+    } else {
+      throw new HocusPocusError("Access Denied")
+    }
+  } else if (response?.status === 403) {
+    throw new HocusPocusError("Invalid storage token")
+  } else if (response?.status === 404) {
+    throw new HocusPocusError("YDoc not found")
   } else {
-    const response = await fetchStorage(
-      `/v2/ydocs/${documentName}/access-level/`,
-      {
-        headers: {
-          "X-Storage-Token": token,
-          ...proxyAuthHeaders,
-        }
-      }
-    )
-
-    if (response?.ok) {
-      const data = await response.json()
-      if (data === "read-write") {
-        return proxyAuthHeaders
-      } else if (data === "read-only") {
-        connection.readOnly = true
-        return proxyAuthHeaders
-      } else {
-        throw new HocusPocusError("Access Denied")
-      }
-    } else if (response?.status === 403) {
-      throw new HocusPocusError("Invalid storage token")
-    } else if (response?.status === 404) {
-      throw new HocusPocusError("YDoc not found")
-    } else {
-      throw new HocusPocusError()
-    }
+    throw new HocusPocusError()
   }
 }
