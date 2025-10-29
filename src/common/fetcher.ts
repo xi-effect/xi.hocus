@@ -1,7 +1,7 @@
 import { logServerError } from "./errors"
 
 const back2BaseUrl = process.env.BACK_2_BASE_URL || "http://localhost:5000"
-const back2BasePath = "/internal/storage-service"
+const back2BasePath = "/internal/storage-service/v2"
 const back2ApiKey = process.env.BACK_2_API_KEY || "local"
 
 export async function fetchStorage(path: string, init?: RequestInit): Promise<Response | undefined> {
