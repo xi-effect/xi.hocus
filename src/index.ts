@@ -15,7 +15,11 @@ const server = Server.configure({
   quiet: true,
   onAuthenticate: verifyYDocAccess,
   extensions: [
-    new Logger(),
+    new Logger(
+      {
+        onChange: process.env.ENABLE_CHANGE_LOGS === "true",
+      }
+    ),
     new Database({
       fetch: downloadYDocContent,
       store: storeYDocContent,
