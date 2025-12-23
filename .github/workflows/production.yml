@@ -7,7 +7,7 @@ on:
 
 jobs:
   prepare:
-    if: github.triggering_actor == 'niqzart'
+    if: github.triggering_actor == 'niqzart' || github.triggering_actor == 'unknownproperty'
     uses: ./.github/workflows/common-work.yml
     with:
       tag: hocus-main
@@ -15,7 +15,7 @@ jobs:
     secrets: inherit
 
   deploy_production:
-    if: github.triggering_actor == 'niqzart'
+    if: github.triggering_actor == 'niqzart' || github.triggering_actor == 'unknownproperty'
     needs: prepare
     runs-on: ubuntu-latest
     environment: production
