@@ -17,7 +17,7 @@ const server = Server.configure({
   extensions: [
     new Logger(
       {
-        onChange: process.env.ENABLE_CHANGE_LOGS === "true",
+        onChange: process.env.enable_change_logs === "true",
       }
     ),
     new Database({
