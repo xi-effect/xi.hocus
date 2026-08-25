@@ -42,7 +42,7 @@ export async function verifyYDocAccess(
     `/ydocs/${documentName}/access-level/`,
     {
       headers: {
-        "X-Storage-Token": token,
+        "X-Content-Token": token,
         ...proxyAuthHeaders,
       }
     }
@@ -59,7 +59,7 @@ export async function verifyYDocAccess(
       throw new HocusPocusError("Access Denied")
     }
   } else if (response?.status === 403) {
-    throw new HocusPocusError("Invalid storage token")
+    throw new HocusPocusError("Invalid content token")
   } else if (response?.status === 404) {
     throw new HocusPocusError("YDoc not found")
   } else {
