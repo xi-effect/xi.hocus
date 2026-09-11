@@ -1,0 +1,93 @@
+name: Common Pipeline Steps
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      base_tag:
+        type: string
+        required: false
+      branch:
+        type: string
+        required: true
+      commit_sha:
+        type: string
+        required: true
+      enable_deployment:
+        type: boolean
+        required: true
+      is_mainline_staging:
+        type: boolean
+        required: true
+      is_mainline_production:
+        type: boolean
+        required: true
+
+jobs:
+  build:
+    uses: xi-effect/xi.actions/.github/workflows/docker-build.yml@main
+    with:
+      tag: ${{ inputs.tag }}
+      base-tag: ${{ inputs.base_tag }}
+    secrets: inherit
+
+  deploy:
+    needs: build
+    if: ${{ inputs.enable_deployment }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: staging
+            is_mainline: ${{ inputs.is_mainline_staging }}
+          - environment: production
+            is_mainline: ${{ inputs.is_mainline_production }}
+
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.environment }}
+
+    env:
+      pull_image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_USERNAME }}:${{ inputs.tag }}
+      deploy_image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_USERNAME }}:${{ secrets.DEPLOY_TAG }}
+
+    steps:
+      - name: Run SSH commands
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          username: ${{ secrets.SSH_USER }}
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
+          script: |-
+            cd ~/xieffect-core
+            docker pull ${{ env.pull_image }}
+            docker tag ${{ env.pull_image }} ${{ env.deploy_image }}
+            ${{ !matrix.is_mainline }} || docker tag ${{ env.deploy_image }} ${{ env.deploy_image }}-backup
+            docker rmi ${{ env.pull_image }}
+            docker compose up -d ${{ vars.compose_app_service }}
+          script_stop: true
+
+      - name: Report status to discord
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: |-
+            :white_check_mark: Service xi.hocus successfully deployed
+            Commit: `${{ inputs.commit_sha }}`
+            Branch: `${{ inputs.branch }}`
+            Issuer: `${{ github.triggering_actor }}`
+
+      - name: Report failure to discord
+        if: ${{ failure() }}
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: |-
+            :red_circle: [Service xi.hocus failed to deploy](<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>)
+            Commit: `${{ inputs.commit_sha }}`
+            Branch: `${{ inputs.branch }}`
+            Issuer: `${{ github.triggering_actor }}`
