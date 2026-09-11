@@ -1,6 +1,6 @@
-import { fetchPayload } from "@hocuspocus/server"
+import type { fetchPayload } from "@hocuspocus/server"
 
-import { HocusPocusError } from "../common/errors"
+import { HocusPocusError, logServerError } from "../common/errors"
 import { fetchStorageSafely } from "../common/fetcher"
 
 export async function downloadYDocContent({ documentName }: fetchPayload): Promise<Uint8Array | null> {
@@ -11,11 +11,16 @@ export async function downloadYDocContent({ documentName }: fetchPayload): Promi
     throw new HocusPocusError()
   }
 
-  const arrayBuffer = await response.arrayBuffer()
-
-  if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+  const contentLength = response.headers.get("content-length")
+  if (contentLength === "0") {
     return null
   }
 
-  return new Uint8Array(arrayBuffer)
+  const buf = await response.arrayBuffer().catch(() => null)
+  if (!buf) {
+    logServerError("Download: failed to read arrayBuffer")
+    throw new HocusPocusError()
+  }
+
+  return new Uint8Array(buf)
 }

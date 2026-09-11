@@ -1,0 +1,21 @@
+name: Production
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  main:
+    if: ${{ github.triggering_actor == 'niqzart' || github.triggering_actor == 'unknownproperty' }}
+    uses: ./.github/workflows/main.yml
+    with:
+      tag: hocus-${{ github.ref_name }}
+      base_tag: hocus-staging
+      branch: ${{ github.ref_name }}
+      commit_sha: ${{ github.sha }}
+      enable_deployment: true
+      is_mainline_staging: true
+      is_mainline_production: ${{ github.ref_name == 'main' }}
+    secrets: inherit
