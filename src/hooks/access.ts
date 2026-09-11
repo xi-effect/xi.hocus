@@ -1,5 +1,5 @@
-import { onAuthenticatePayload } from "@hocuspocus/server"
-import { IncomingHttpHeaders } from "http"
+import type { onAuthenticatePayload } from "@hocuspocus/server"
+import type { IncomingHttpHeaders } from "http"
 
 import { HocusPocusError, logServerError } from "../common/errors"
 import { fetchStorage } from "../common/fetcher"
@@ -9,7 +9,7 @@ function getSimpleHeaderValue(headers: IncomingHttpHeaders, name: string): strin
   if (typeof header === "string") {
     return header
   }
-  logServerError(`Invalid auth header in ${name}: ${header}\n${headers}`)
+  logServerError(`Invalid auth header in ${name}: ${header}\n${JSON.stringify(headers)}`)
   throw new HocusPocusError("Proxy Error")
 }
 
@@ -28,7 +28,7 @@ function parseProxyHeaders(requestHeaders: IncomingHttpHeaders): ProxyAuthHeader
 }
 
 export async function verifyYDocAccess(
-  { documentName, requestHeaders, connection, token }: onAuthenticatePayload
+  { documentName, requestHeaders, connectionConfig, token }: onAuthenticatePayload
 ): Promise<{} | ProxyAuthHeadersT> {
   if (documentName.startsWith("test/")) return {}
 
@@ -49,11 +49,11 @@ export async function verifyYDocAccess(
   )
 
   if (response?.ok) {
-    const data = await response.json()
+    const data: unknown = await response.json()
     if (data === "read-write") {
       return proxyAuthHeaders
     } else if (data === "read-only") {
-      connection.readOnly = true
+      connectionConfig.readOnly = true
       return proxyAuthHeaders
     } else {
       throw new HocusPocusError("Access Denied")
