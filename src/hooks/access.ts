@@ -1,15 +1,15 @@
 import type { onAuthenticatePayload } from "@hocuspocus/server"
-import type { IncomingHttpHeaders } from "http"
 
 import { HocusPocusError, logServerError } from "../common/errors"
 import { fetchStorage } from "../common/fetcher"
 
-function getSimpleHeaderValue(headers: IncomingHttpHeaders, name: string): string {
-  const header = headers[name.toLowerCase()]
-  if (typeof header === "string") {
+function getSimpleHeaderValue(headers: Headers, name: string): string {
+  const header = headers.get(name)
+  if (header !== null) {
     return header
   }
-  logServerError(`Invalid auth header in ${name}: ${header}\n${JSON.stringify(headers)}`)
+  const headerDump = JSON.stringify(Object.fromEntries(headers))
+  logServerError(`Missing auth header ${name}\n${headerDump}`)
   throw new HocusPocusError("Proxy Error")
 }
 
@@ -19,7 +19,7 @@ type ProxyAuthHeadersT = {
   "X-Username": string,
 }
 
-function parseProxyHeaders(requestHeaders: IncomingHttpHeaders): ProxyAuthHeadersT {
+function parseProxyHeaders(requestHeaders: Headers): ProxyAuthHeadersT {
   return {
     "X-Session-ID": getSimpleHeaderValue(requestHeaders, "X-Session-ID"),
     "X-User-ID": getSimpleHeaderValue(requestHeaders, "X-User-ID"),
