@@ -11,14 +11,17 @@
     "type": "git",
     "url": "git+https://github.com/xi-effect/xi.hocus.git"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "devDependencies": {
-    "@types/node": "^22.5.5",
+    "@types/node": "^24.13.4",
     "tsx": "^4.19.2",
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@hocuspocus/extension-database": "^3.4.4",
-    "@hocuspocus/extension-logger": "^3.4.4",
-    "@hocuspocus/server": "^3.4.4"
+    "@hocuspocus/extension-database": "^4.7.0",
+    "@hocuspocus/extension-logger": "^4.7.0",
+    "@hocuspocus/server": "^4.7.0"
   }
 }
