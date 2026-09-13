@@ -7,8 +7,8 @@ docker compose up --build -d
 ## How To (raw)
 ### Setup Node
 ```
-nvm install 20.16.0
-nvm use 20.16.0
+nvm install 24.21.0
+nvm use 24.21.0
 ```
 
 ### Install
