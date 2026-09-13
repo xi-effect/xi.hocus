@@ -1,30 +1,27 @@
 import type { storePayload } from "@hocuspocus/server"
-import { gzipSync } from "zlib"
 
-import { logServerError } from "../common/errors"
+import { HocusPocusError, logServerError } from "../common/errors"
 import { fetchStorageSafely } from "../common/fetcher"
+import { writeYDocContent } from "../common/storage"
 
 export async function storeYDocContent({ documentName, state }: storePayload): Promise<void> {
   if (documentName.startsWith("test/")) return
 
-  let compressed: Buffer
   try {
-    compressed = gzipSync(state)
+    await writeYDocContent(documentName, state)
   } catch (e) {
     logServerError(e)
-    return
+    throw new HocusPocusError()
   }
 
-  await fetchStorageSafely(
-    `/ydocs/${documentName}/content/`,
+  void fetchStorageSafely(
+    `/ydocs/${documentName}/content-meta/`,
     {
       method: "PUT",
       headers: {
-        "Content-Type": "application/octet-stream",
-        "Content-Encoding": "gzip",
-        "X-Size-Bytes": String(state.length),
+        "Content-Type": "application/json",
       },
-      body: new Uint8Array(compressed),
+      body: JSON.stringify({ size_bytes: state.length }),
     }
   )
 }
