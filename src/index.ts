@@ -9,7 +9,7 @@ import { storeYDocContent } from "./hooks/store"
 const server = new Server({
   name: "xi.hocus",
   port: 1234,
-  timeout: 30000,
+  timeout: 60000,
   debounce: 5000,
   maxDebounce: 30000,
   quiet: true,
