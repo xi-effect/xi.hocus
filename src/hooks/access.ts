@@ -16,14 +16,12 @@ function getSimpleHeaderValue(headers: Headers, name: string): string {
 type ProxyAuthHeadersT = {
   "X-Session-ID": string,
   "X-User-ID": string,
-  "X-Username": string,
 }
 
 function parseProxyHeaders(requestHeaders: Headers): ProxyAuthHeadersT {
   return {
     "X-Session-ID": getSimpleHeaderValue(requestHeaders, "X-Session-ID"),
     "X-User-ID": getSimpleHeaderValue(requestHeaders, "X-User-ID"),
-    "X-Username": getSimpleHeaderValue(requestHeaders, "X-Username"),
   }
 }
 
